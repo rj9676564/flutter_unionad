@@ -2,9 +2,15 @@ package com.gstory.flutter_unionad
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.text.TextUtils
 import android.util.Log
 import androidx.annotation.NonNull
+import com.bytedance.sdk.openadsdk.AdSlot
+import com.bytedance.sdk.openadsdk.CSJAdError
+import com.bytedance.sdk.openadsdk.CSJSplashAd
+import com.bytedance.sdk.openadsdk.TTAdLoadType
+import com.bytedance.sdk.openadsdk.TTAdNative
 import com.bytedance.sdk.openadsdk.TTAdSdk
 import com.gstory.flutter_unionad.fullscreenvideoadinteraction.FullScreenVideoAdInteraction
 import com.gstory.flutter_unionad.rewardvideoad.RewardVideoAd
@@ -20,12 +26,13 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** FlutterUnionadPlugin */
 public class FlutterUnionadPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
+    private val TAG = "FlutterUnionadPlugin->"
 
     private lateinit var channel: MethodChannel
     private var applicationContext: Context? = null
     private var mActivity: Activity? = null
     private var mFlutterPluginBinding: FlutterPlugin.FlutterPluginBinding? = null
-
+    private var defaultSplashAdCode:String? = null
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         mActivity = binding.activity
         Log.e("FlutterUnionadPlugin->", "onAttachedToActivity")
@@ -73,6 +80,7 @@ public class FlutterUnionadPlugin : FlutterPlugin, MethodCallHandler, ActivityAw
         //注册初始化
         if (call.method == "register") {
             var arguments = call.arguments as Map<String?, Any?>
+            defaultSplashAdCode = arguments["defaultSplashAdCode"] as String?
             val appId = arguments["androidAppId"] as String?
             if (appId == null || appId.trim { it <= ' ' }.isEmpty()) {
                 Log.e("初始化", "appId can't be null")
@@ -86,6 +94,7 @@ public class FlutterUnionadPlugin : FlutterPlugin, MethodCallHandler, ActivityAw
                             mActivity?.runOnUiThread(Runnable {
                                 result.success(true)
                             })
+                            loadSplashAd()
                         }
 
                         override fun fail(p0: Int, p1: String?) {
@@ -139,5 +148,47 @@ public class FlutterUnionadPlugin : FlutterPlugin, MethodCallHandler, ActivityAw
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+    }
+
+    private fun loadSplashAd() {
+        Log.e(TAG, "loadSplashAd: $defaultSplashAdCode")
+        if (defaultSplashAdCode == null) {
+            return;
+        }
+        val mTTAdNative = TTAdSdk.getAdManager().createAdNative(mActivity)
+        var adSlot = AdSlot.Builder()
+            .setCodeId(defaultSplashAdCode)
+            .setAdLoadType(TTAdLoadType.PRELOAD)
+            .setAdCount(3)
+            .setSupportDeepLink(true)
+            //不区分渲染方式，要求开发者同时设置setImageAcceptedSize（单位：px）和setExpressViewAcceptedSize（单位：dp ）接口，不同时设置可能会导致展示异常。
+            .build()
+
+        //step4:请求广告，调用开屏广告异步请求接口，对请求回调的广告作渲染处理
+        mTTAdNative.loadSplashAd(adSlot,object : TTAdNative.CSJSplashAdListener{
+
+            override fun onSplashLoadSuccess(p0: CSJSplashAd?) {
+                Log.e(TAG, "pre 开屏广告加载成功")
+            }
+
+            override fun onSplashLoadFail(p0: CSJAdError?) {
+                Log.e(TAG, p0?.msg.toString())
+                Log.e(TAG,"pre  onFail"+p0?.msg.toString())
+            }
+
+            override fun onSplashRenderSuccess(ad: CSJSplashAd?) {
+                Log.e(TAG, "pre 开屏广告渲染成功")
+                if (ad == null) {
+                    Log.e(TAG," pre onFail"+"拉去广告失败")
+                    return
+                }
+            }
+
+            override fun onSplashRenderFail(p0: CSJSplashAd?, p1: CSJAdError?) {
+                Log.e(TAG, p1?.msg.toString())
+                Log.e(TAG,"pre onFail"+p1?.msg.toString())
+            }
+
+        },4000)
     }
 }

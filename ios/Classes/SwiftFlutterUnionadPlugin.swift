@@ -25,10 +25,12 @@ public class SwiftFlutterUnionadPlugin: NSObject, FlutterPlugin {
         let param = call.arguments as! NSDictionary
         let isDebug = param.value(forKey: "debug") as? Bool ?? false;
         let appId = param.value(forKey: "iosAppId") as? String
+        let defaultSplashAdCode:String? = param.value(forKey: "defaultSplashAdCode") as? String
         LogUtil.logInstance.isShow(debug: isDebug)
         TTAdManagerHolder.instace.initTTSDK(params: param) { isSuccess, error in
             if(isSuccess){
                 result(true)
+                self.preloadSplashAd(initSplashAdId: defaultSplashAdCode)
             }else{
                 result(false)
             }
@@ -78,4 +80,21 @@ public class SwiftFlutterUnionadPlugin: NSObject, FlutterPlugin {
         result(FlutterMethodNotImplemented)
     }
   }
+    private func preloadSplashAd(initSplashAdId:String?){
+        guard let adId = initSplashAdId else {
+               return
+           }
+        let size : CGSize
+        
+        let screenSize = UIScreen.main.bounds.size
+              let width = screenSize.width
+              let height = screenSize.height
+
+        size = CGSize(width: CGFloat(width), height: CGFloat(height))
+        let slot = BUAdSlot.init()
+        slot.adLoadType = BUAdLoadType.preload
+        slot.id = initSplashAdId!
+        let splashAd = BUSplashAd.init(slot: slot, adSize: size)
+        splashAd.loadData()
+    }
 }
