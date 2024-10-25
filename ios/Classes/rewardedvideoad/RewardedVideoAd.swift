@@ -21,17 +21,9 @@ public class RewardedVideoAd : NSObject{
         LogUtil.logInstance.printLog(message: params)
         let mCodeId = params.value(forKey: "iosCodeId") as? String
         let userID = params.value(forKey: "userID") as? String
-        let rewardName = params.value(forKey: "rewardName") as? String
-        let rewardAmount = params.value(forKey: "rewardAmount") as? Int
         let mediaExtra = params.value(forKey: "mediaExtra") as? String
         self.rewardModel = BURewardedVideoModel()
         self.rewardModel!.userId = userID
-        if rewardName != nil {
-            self.rewardModel!.rewardName = rewardName
-        }
-        if rewardAmount != nil {
-            self.rewardModel!.rewardAmount = rewardAmount!
-        }
         if mediaExtra != nil {
             self.rewardModel!.extra = mediaExtra
         }
@@ -109,8 +101,6 @@ extension RewardedVideoAd: BUNativeExpressRewardedVideoAdDelegate {
         let map : NSDictionary = ["adType":"rewardAd",
                                   "onAdMethod":"onVerify",
                                   "rewardVerify":false,
-                                  "rewardAmount":rewardedVideoAd.rewardedVideoModel.rewardAmount,
-                                  "rewardName":rewardedVideoAd.rewardedVideoModel.rewardName ?? "",
                                   "errorCode":error != nil ? (error! as NSError).code : 0,
                                   "error":error?.localizedDescription]
         SwiftFlutterUnionadPlugin.event!.sendEvent(event: map)
@@ -118,8 +108,6 @@ extension RewardedVideoAd: BUNativeExpressRewardedVideoAdDelegate {
         let arrivedMap : NSDictionary = ["adType":"rewardAd",
                                   "onAdMethod":"onRewardArrived",
                                   "rewardVerify":false,
-                                  "rewardAmount":rewardedVideoAd.rewardedVideoModel.rewardAmount,
-                                  "rewardName":rewardedVideoAd.rewardedVideoModel.rewardName ?? "",
                                   "errorCode":error != nil ? (error! as NSError).code : 0,
                                          "error":error?.localizedDescription,
                                   "rewardType":rewardedVideoAd.rewardedVideoModel.rewardType.rawValue,
@@ -134,8 +122,6 @@ extension RewardedVideoAd: BUNativeExpressRewardedVideoAdDelegate {
         let map : NSDictionary = ["adType":"rewardAd",
                                   "onAdMethod":"onVerify",
                                   "rewardVerify":verify,
-                                  "rewardAmount":rewardedVideoAd.rewardedVideoModel.rewardAmount,
-                                  "rewardName":rewardedVideoAd.rewardedVideoModel.rewardName ?? "",
                                   "errorCode":0,
                                   "error":""]
         SwiftFlutterUnionadPlugin.event!.sendEvent(event: map)
@@ -143,8 +129,6 @@ extension RewardedVideoAd: BUNativeExpressRewardedVideoAdDelegate {
         let arrivedMap : NSDictionary = ["adType":"rewardAd",
                                   "onAdMethod":"onRewardArrived",
                                   "rewardVerify":verify,
-                                  "rewardAmount":rewardedVideoAd.rewardedVideoModel.rewardAmount,
-                                  "rewardName":rewardedVideoAd.rewardedVideoModel.rewardName ?? "",
                                   "errorCode":0,
                                   "error":"",
                                   "rewardType":rewardedVideoAd.rewardedVideoModel.rewardType.rawValue,

@@ -39,8 +39,6 @@ object RewardVideoAd {
         this.mContext = context
         this.mActivity = mActivity
         this.mCodeId = params["androidCodeId"] as String
-        this.rewardName = params["rewardName"] as String
-        this.rewardAmount = params["rewardAmount"] as Int
         this.userID = params["userID"] as String
         if (params["orientation"] == null) {
             orientation = 0
@@ -56,14 +54,17 @@ object RewardVideoAd {
     }
 
     private fun loadRewardVideoAd() {
+//        val adSlot = AdSlot.Builder()
+//            .setCodeId(mCodeId) //广告位id
+//            .setAdLoadType(TTAdLoadType.PRELOAD)
+//            .setOrientation(orientation!!)//横竖屏设置
+//            .build()
         val adSlot = AdSlot.Builder()
             .setCodeId(mCodeId) //广告位id
             .setUserID(userID)
             .setOrientation(orientation!!)//横竖屏设置
             .setMediationAdSlot(
                 MediationAdSlot.Builder()
-                    .setRewardName(rewardName) //奖励的名称
-                    .setRewardAmount(rewardAmount!!) //奖励的数量
                     .setExtraObject(MediationConstant.ADN_PANGLE, mediaExtra)//服务端奖励验证透传参数
                     .setExtraObject(MediationConstant.KEY_GROMORE_EXTRA, mediaExtra)
                     .setExtraObject(MediationConstant.ADN_GDT, mediaExtra)

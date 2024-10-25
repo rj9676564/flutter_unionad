@@ -276,8 +276,6 @@ class FlutterUnionad {
   static Future<bool> loadRewardVideoAd({
     required String androidCodeId,
     required String iosCodeId,
-    required String rewardName,
-    required int rewardAmount,
     required String userID,
     int? orientation,
     String? mediaExtra,
@@ -285,8 +283,6 @@ class FlutterUnionad {
     return await _channel.invokeMethod("loadRewardVideoAd", {
       "androidCodeId": androidCodeId,
       "iosCodeId": iosCodeId,
-      "rewardName": rewardName,
-      "rewardAmount": rewardAmount,
       "userID": userID,
       "orientation": orientation ?? 0,
       "mediaExtra": mediaExtra ?? "",

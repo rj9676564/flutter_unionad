@@ -22,6 +22,7 @@ class FlutterUnionadStream {
       FlutterUnionadRewardAdCallBack? flutterUnionadRewardAdCallBack}) {
     StreamSubscription _adStream =
         adEventEvent.receiveBroadcastStream().listen((data) {
+          print("FlutterUnionadStream ${data}");
       switch (data[FlutterUnionadType.adType]) {
 
         ///全屏广告
